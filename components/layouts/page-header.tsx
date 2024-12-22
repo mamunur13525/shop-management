@@ -6,7 +6,7 @@ interface Props {
 
 const PageHeader = ({ title }: Props) => {
   return (
-    <div className="py-4">
+    <div className="pb-4">
       <h1 className="w-full text-2xl font-bold">{title}</h1>
     </div>
   );
