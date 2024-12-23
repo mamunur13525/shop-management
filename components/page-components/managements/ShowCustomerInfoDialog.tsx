@@ -13,7 +13,9 @@ const ShowCustomerInfoDialog = ({ open, setOpen, customer = null }: { open: bool
                 <DrawerHeader>
                     <DrawerTitle>Customer Information</DrawerTitle>
                 </DrawerHeader>
-                <ShowCustomerInfo customer={customer} />
+                <div className="py-4 px-6">   
+                    <ShowCustomerInfo customer={customer} />
+                </div>
             </DrawerContent>
         </Drawer>
     }
