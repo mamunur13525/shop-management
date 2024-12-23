@@ -6,6 +6,7 @@ import { demoCustomerList } from "@/demo/demo-user";
 import { Customer } from "@/lib/types";
 import DeleteCustomerDialog from "./DeleteCustomerDialog";
 import CustomerActionDialoge from "./CustomerActionDialoge";
+import ShowCustomerInfoDialog from "./ShowCustomerInfoDialog";
 
 const CustomerComponent = () => {
     const [customers, setCustomers] = useState<Customer[]>(demoCustomerList);
@@ -19,6 +20,11 @@ const CustomerComponent = () => {
         status: boolean;
         customer: Customer;
     }>({ status: false, customer: {} as Customer });
+    const [showCustomerInfoOpen, setShowCustomerInfoOpen] = useState<{
+        status: boolean;
+        customer: Customer | null;
+    }>({ status: false, customer: null });
+
 
     const handleDeleteCustomer = (customer: Customer) => {
         console.log({ customer });
@@ -28,6 +34,11 @@ const CustomerComponent = () => {
     const handleEditCustomer = (customer: Customer) => {
         console.log({ customer });
         setEditOpen({ status: true, customer });
+    };
+
+    const handleShowCustomerInfo = (customer: Customer) => {
+        console.log({ customer });
+        setShowCustomerInfoOpen({ status: true, customer });
     };
 
     return (
@@ -53,11 +64,17 @@ const CustomerComponent = () => {
                         customer={editOpen.customer || {}}
                     />
                 )}
+            <ShowCustomerInfoDialog
+                open={showCustomerInfoOpen.status}
+                setOpen={() => setShowCustomerInfoOpen({ status: false, customer: null })}
+                customer={showCustomerInfoOpen.customer}
+            />
             <CustomerTable
                 customers={customers}
                 handleAddCustomer={() => setOpen(true)}
                 handleDeleteCustomer={handleDeleteCustomer}
                 handleEditCustomer={handleEditCustomer}
+                handleShowCustomerInfo={handleShowCustomerInfo}
             />
         </div>
     );

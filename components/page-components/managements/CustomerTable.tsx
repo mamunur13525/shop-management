@@ -34,8 +34,11 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Customer } from "@/lib/types";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export const columns = (handleEditCustomer: (customer: Customer) => void, handleDeleteCustomer: (customer: Customer) => void): ColumnDef<Customer>[] => [
+export const columns = (handleShowCustomerInfo: (customer: Customer) => void, handleEditCustomer: (customer: Customer) => void, handleDeleteCustomer: (customer: Customer) => void): ColumnDef<Customer>[] => [
     {
         id: "select",
         header: ({ table }) => (
@@ -61,31 +64,44 @@ export const columns = (handleEditCustomer: (customer: Customer) => void, handle
     {
         id: "serial",
         header: "No",
-        cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
+        cell: ({ row }) => <div className="text-left">{row.index + 1}</div>,
         enableSorting: false,
         enableHiding: false,
     },
     {
         accessorKey: "name",
         header: "Name",
-        cell: ({ row }) => <div>{row.getValue("name")}</div>,
+        cell: ({ row }) => <div onClick={() => handleShowCustomerInfo(row.original)} className="cursor-pointer">{row.getValue("name")}</div>,
     },
     {
         accessorKey: "address",
         header: "Address",
-        cell: ({ row }) => <div>{row.getValue("address")}</div>,
+        cell: ({ row }) => <div onClick={() => handleShowCustomerInfo(row.original)} className="cursor-pointer">{row.getValue("address")}</div>,
     },
     {
         accessorKey: "mobile",
         header: "Mobile",
-        cell: ({ row }) => <div>{row.getValue("mobile")}</div>,
+        cell: ({ row }) => <div onClick={() => handleShowCustomerInfo(row.original)} className="cursor-pointer">{row.getValue("mobile")}</div>,
+    },
+    {
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) => (
+            <div className="text-left">
+                <Badge className={cn(row.getValue("status") === "active" ? "bg-green-700/20 text-green-700" : "bg-red-500/20 text-red-600", 'uppercase border')}>
+                    {row.getValue("status")}
+                </Badge>
+            </div>
+        ),
+        enableSorting: false,
+        enableHiding: false,
     },
     {
         accessorKey: "amount",
         header: () => <div className="text-right">Amount</div>,
         cell: ({ row }) => {
             const amount = row.getValue("amount") as string;
-            return <div className="text-right font-medium">{amount}</div>;
+            return <div onClick={() => handleShowCustomerInfo(row.original)} className="text-right font-medium cursor-pointer">{amount}</div>;
         },
     },
     {
@@ -129,12 +145,14 @@ export function CustomerTable({
     customers = [],
     handleAddCustomer,
     handleDeleteCustomer,
-    handleEditCustomer
+    handleEditCustomer,
+    handleShowCustomerInfo
 }: {
     customers: Customer[];
     handleAddCustomer: () => void;
     handleDeleteCustomer: (customer: Customer) => void;
     handleEditCustomer: (customer: Customer) => void;
+    handleShowCustomerInfo: (customer: Customer) => void;
 }) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -146,7 +164,7 @@ export function CustomerTable({
 
     const table = useReactTable({
         data: customers,
-        columns: columns(handleEditCustomer, handleDeleteCustomer),
+        columns: columns(handleShowCustomerInfo, handleEditCustomer, handleDeleteCustomer),
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
@@ -207,6 +225,21 @@ export function CustomerTable({
                     }
                     className="max-w-sm ml-2"
                 />
+                <Select
+                    onValueChange={(value) =>
+                        table.getColumn("status")?.setFilterValue(value === "all" ? "" : value)
+                    }
+                    value={(table.getColumn("status")?.getFilterValue() as string) ?? ""}
+                >
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue defaultValue={'all'} placeholder="Filter Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem className="text-capitalize text-green-700 hover:!text-green-700/80" value="active">Active</SelectItem>
+                        <SelectItem className="text-capitalize text-red-600 hover:!text-red-600/80" value="closed">Closed</SelectItem>
+                    </SelectContent>
+                </Select>
                 <div className="w-[1px] h-8 bg-border mx-2" />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
