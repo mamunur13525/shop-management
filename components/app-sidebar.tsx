@@ -9,6 +9,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Home, Inbox, Settings } from "lucide-react";
 import Link from "next/link";
@@ -33,6 +34,14 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const { toggleSidebar } = useSidebar()
+
+  const handleToggleSidebar = () => {
+    if (window.innerWidth < 768) {
+      toggleSidebar()
+    }
+  }
+
   return (
     <Sidebar>
       <SidebarHeader className="text-2xl font-bold text-left">
@@ -45,6 +54,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem
+                  onClick={handleToggleSidebar}
                   key={item.title}
                 >
                   <SidebarMenuButton asChild>

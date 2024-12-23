@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/table";
 import { Customer } from "@/lib/types";
 
-export const columns = (handleDeleteCustomer: (customerId: string) => void): ColumnDef<Customer>[] => [
+export const columns = (handleEditCustomer: (customer: Customer) => void, handleDeleteCustomer: (customer: Customer) => void): ColumnDef<Customer>[] => [
     {
         id: "select",
         header: ({ table }) => (
@@ -92,7 +92,8 @@ export const columns = (handleDeleteCustomer: (customerId: string) => void): Col
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
-            const handleDelete = () => handleDeleteCustomer(row.id);
+            const handleDelete = () => handleDeleteCustomer(row.original);
+            const handleEdit = () => handleEditCustomer(row.original);
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -104,6 +105,11 @@ export const columns = (handleDeleteCustomer: (customerId: string) => void): Col
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
+                        <DropdownMenuItem
+                            onClick={handleEdit}
+                            className="cursor-pointer">
+                            Edit
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                             onClick={handleDelete}
                             className="cursor-pointer text-red-500 hover:!bg-red-500/10 hover:!text-red-500">
@@ -123,10 +129,12 @@ export function CustomerTable({
     customers = [],
     handleAddCustomer,
     handleDeleteCustomer,
+    handleEditCustomer
 }: {
     customers: Customer[];
     handleAddCustomer: () => void;
-    handleDeleteCustomer: (customerId: string) => void;
+    handleDeleteCustomer: (customer: Customer) => void;
+    handleEditCustomer: (customer: Customer) => void;
 }) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -138,7 +146,7 @@ export function CustomerTable({
 
     const table = useReactTable({
         data: customers,
-        columns: columns(handleDeleteCustomer),
+        columns: columns(handleEditCustomer, handleDeleteCustomer),
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
@@ -157,7 +165,7 @@ export function CustomerTable({
 
     const totalCustomers = customers.length;
     const totalAmount = customers.reduce(
-        (sum, customer) => sum + parseFloat(customer.amount),
+        (sum, customer) => sum + Number(customer.amount),
         0
     );
 

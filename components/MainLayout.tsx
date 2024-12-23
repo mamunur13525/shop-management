@@ -2,15 +2,10 @@
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { useState } from "react";
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
-  const [isOpen, setIsOpen] = useState(true);
-
-
-
   return (
-    <SidebarProvider open={isOpen} onOpenChange={setIsOpen}>
+    <SidebarProvider>
       <AppSidebar  />
       <main className="w-full">
         <SidebarTrigger />
